@@ -15,6 +15,7 @@ COPY --from=build /app/server/dist ./server/dist
 COPY --from=build /app/client/dist ./client/dist
 COPY gear.csv ./
 RUN mkdir -p /app/data
-ENV NODE_ENV=production
+ENV NODE_ENV=production \
+    DB_PATH=/app/data/gear.db
 EXPOSE 8080
 CMD ["node", "server/dist/index.js"]
