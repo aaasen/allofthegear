@@ -36,9 +36,9 @@ function groupBy<T>(arr: T[], key: (i: T) => string): Record<string, T[]> {
   }, {});
 }
 
-function kg(grams: number | null): string {
+function lbs(grams: number | null): string {
   if (grams == null) return "—";
-  return `${(grams / 1000).toFixed(2)} kg`;
+  return `${(grams / 453.592).toFixed(1)} lbs`;
 }
 
 function SparkBar({ pct, color }: { pct: number; color: string }) {
@@ -132,7 +132,7 @@ export function Analysis({ tripId }: Props) {
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
         <StatCard
           label="Total Weight"
-          value={kg(summary.total_weight_g)}
+          value={lbs(summary.total_weight_g)}
           sub={`${summary.unknown_count} items with unknown weight`}
         />
         {summary.by_bag.map((b) => (
@@ -260,7 +260,7 @@ export function Analysis({ tripId }: Props) {
                       </td>
                       <td className="py-2 px-4 text-right text-gray-500">{g.item_count}</td>
                       <td className="py-2 px-4 text-right tabular-nums text-gray-700">
-                        {kg(g.weight_g)}
+                        {lbs(g.weight_g)}
                       </td>
                       <td className="py-2 px-4">
                         <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${

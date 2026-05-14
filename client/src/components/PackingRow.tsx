@@ -34,7 +34,10 @@ export function PackingRow({ item, bags, onSelectBag, onTogglePacked }: Props) {
           <span className="ml-1.5 text-xs text-gray-400">×{item.quantity}</span>
         )}
       </td>
-      <td className="py-2 pr-4 text-sm text-gray-500 tabular-nums whitespace-nowrap">
+      <td className="hidden sm:table-cell py-2 pr-4 text-xs text-gray-400 truncate whitespace-nowrap">
+        {item.type ?? "—"}
+      </td>
+      <td className="hidden sm:table-cell py-2 pr-4 text-sm text-gray-500 tabular-nums whitespace-nowrap">
         {weightDisplay}
       </td>
       <td className="py-2 pr-3" onClick={(e) => e.stopPropagation()}>

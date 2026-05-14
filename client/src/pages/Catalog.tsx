@@ -7,7 +7,7 @@ interface Props {
   tripId: number;
 }
 
-type SortKey = "name" | "group_name" | "type" | "weight_g" | "quantity";
+type SortKey = "name" | "group_name" | "type" | "weight_g" | "quantity" | "bag_name" | "packed";
 
 function validateWeight(v: string): string | null {
   if (v === "" || v === "—") return null; // allow clearing
@@ -137,8 +137,8 @@ export function Catalog({ tripId }: Props) {
               <SortHeader label="Category" k="group_name" />
               <SortHeader label="Qty" k="quantity" />
               <SortHeader label="Weight" k="weight_g" />
-              <th className="text-left py-2 px-4 font-medium text-gray-600">Bag</th>
-              <th className="text-left py-2 px-4 font-medium text-gray-600">Packed</th>
+              <SortHeader label="Bag" k="bag_name" />
+              <SortHeader label="Packed" k="packed" />
               <th className="w-10" />
             </tr>
           </thead>

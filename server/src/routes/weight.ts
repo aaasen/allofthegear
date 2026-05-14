@@ -14,7 +14,7 @@ router.get("/", (req: Request<TripParams>, res) => {
     .prepare(`
       SELECT
         SUM(weight_g * quantity) as total_weight_g,
-        SUM(CASE WHEN weight_g IS NULL THEN quantity ELSE 0 END) as unknown_count
+        COUNT(CASE WHEN weight_g IS NULL THEN 1 END) as unknown_count
       FROM trip_items WHERE trip_id = ?
     `)
     .get(tripId) as { total_weight_g: number | null; unknown_count: number };

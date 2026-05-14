@@ -62,9 +62,6 @@ export function Packing({ tripId }: Props) {
   };
 
   const totalWeight = items.reduce((sum, i) => sum + (i.weight_g ?? 0) * i.quantity, 0);
-  const packedWeight = items
-    .filter((i) => i.packed === 1)
-    .reduce((sum, i) => sum + (i.weight_g ?? 0) * i.quantity, 0);
 
   // Group items preserving CSV insertion order (items are returned ORDER BY id)
   const groups = useMemo(() => groupBy(items, (i) => i.group_name ?? "Uncategorized"), [items]);
@@ -73,83 +70,10 @@ export function Packing({ tripId }: Props) {
   if (loading) return <div className="p-8 text-gray-400">Loading...</div>;
 
   return (
-    <div className="flex gap-6 p-6">
-      {/* Main packing list — flex-1 so sidebar wrapper stretches to the same height */}
-      <div className="flex-1 min-w-0">
-        {/* Header: reset button + weight summary */}
-        <div className="flex items-center justify-between mb-5">
-          <button
-            onClick={async () => {
-              await api.resetPacked(tripId);
-              setItems((prev) => prev.map((i) => ({ ...i, packed: 0 })));
-            }}
-            className="px-3 py-1.5 text-sm font-medium text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
-          >
-            Reset packed
-          </button>
-          <div className="text-sm text-gray-600">
-            <span className="font-semibold text-gray-900">
-              {Math.round(packedWeight).toLocaleString()}g
-            </span>{" "}
-            packed /{" "}
-            <span className="font-semibold text-gray-900">
-              {Math.round(totalWeight).toLocaleString()}g
-            </span>{" "}
-            total
-          </div>
-        </div>
-
-        {/* Grouped tables */}
-        <div className="space-y-6">
-          {groupKeys.map((groupKey) => {
-            const groupItems = groups[groupKey];
-            const groupWeight = groupItems.reduce(
-              (sum, i) => sum + (i.weight_g ?? 0) * i.quantity,
-              0
-            );
-            const packedCount = groupItems.filter((i) => i.packed === 1).length;
-
-            return (
-              <div key={groupKey}>
-                <div className="flex items-baseline gap-2 mb-1">
-                  <h2 className="text-sm font-semibold text-gray-700 uppercase tracking-wide">
-                    {groupKey}
-                  </h2>
-                  <span className="text-xs text-gray-400">
-                    {packedCount}/{groupItems.length} packed ·{" "}
-                    {Math.round(groupWeight).toLocaleString()}g
-                  </span>
-                </div>
-                <div className="rounded-lg border border-gray-200 overflow-hidden">
-                  <table className="w-full table-fixed">
-                    <colgroup>
-                      <col className="w-9" />
-                      <col />
-                      <col className="w-36" />
-                      <col className="w-48" />
-                    </colgroup>
-                    <tbody>
-                      {groupItems.map((item) => (
-                        <PackingRow
-                          key={item.id}
-                          item={item}
-                          bags={bags}
-                          onSelectBag={handleSelectBag}
-                          onTogglePacked={handleTogglePacked}
-                        />
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* Sidebar — wrapper stretches to row height, inner div is sticky */}
-      <div className="w-44 shrink-0">
-        <div className="sticky top-6">
+    <div className="flex flex-col sm:flex-row gap-6 p-6">
+      {/* Sidebar — full width on mobile, fixed column on sm+ */}
+      <div className="w-full sm:w-44 sm:shrink-0 sm:order-last">
+        <div className="sm:sticky sm:top-6">
           <div className="rounded-lg border border-gray-200 bg-white p-4">
             <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">
               Bag Weights
@@ -183,6 +107,81 @@ export function Packing({ tripId }: Props) {
           </div>
         </div>
       </div>
+
+      {/* Main packing list */}
+      <div className="flex-1 min-w-0">
+        {/* Header: reset button + weight summary */}
+        <div className="flex items-center justify-between mb-5">
+          <button
+            onClick={async () => {
+              await api.resetPacked(tripId);
+              setItems((prev) => prev.map((i) => ({ ...i, packed: 0 })));
+            }}
+            className="px-3 py-1.5 text-sm font-medium text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+          >
+            Reset packed
+          </button>
+          <div className="text-sm text-gray-600">
+            <span className="font-semibold text-gray-900">
+              {items.filter((i) => i.packed === 1).length}
+            </span>{" "}
+            /{" "}
+            <span className="font-semibold text-gray-900">
+              {items.length}
+            </span>{" "}
+            items packed
+          </div>
+        </div>
+
+        {/* Grouped tables */}
+        <div className="space-y-6">
+          {groupKeys.map((groupKey) => {
+            const groupItems = groups[groupKey];
+            const groupWeight = groupItems.reduce(
+              (sum, i) => sum + (i.weight_g ?? 0) * i.quantity,
+              0
+            );
+            const packedCount = groupItems.filter((i) => i.packed === 1).length;
+
+            return (
+              <div key={groupKey}>
+                <div className="flex items-baseline gap-2 mb-1">
+                  <h2 className="text-sm font-semibold text-gray-700 uppercase tracking-wide">
+                    {groupKey}
+                  </h2>
+                  <span className="text-xs text-gray-400">
+                    {packedCount}/{groupItems.length} packed ·{" "}
+                    {toLbs(groupWeight)} lbs
+                  </span>
+                </div>
+                <div className="rounded-lg border border-gray-200 overflow-hidden">
+                  <table className="w-full table-fixed">
+                    <colgroup>
+                      <col className="w-9" />
+                      <col />
+                      <col className="w-0 sm:w-28" />
+                      <col className="w-0 sm:w-32" />
+                      <col className="w-48" />
+                    </colgroup>
+                    <tbody>
+                      {groupItems.map((item) => (
+                        <PackingRow
+                          key={item.id}
+                          item={item}
+                          bags={bags}
+                          onSelectBag={handleSelectBag}
+                          onTogglePacked={handleTogglePacked}
+                        />
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
     </div>
   );
 }
