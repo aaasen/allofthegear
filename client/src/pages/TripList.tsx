@@ -1,11 +1,14 @@
 import { Link } from "react-router-dom";
+import { api } from "../api/client";
 import type { Trip } from "../api/types";
+import { EditableCell } from "../components/EditableCell";
 
 interface Props {
   trips: Trip[];
+  onRename: (updated: Trip) => void;
 }
 
-export function TripList({ trips }: Props) {
+export function TripList({ trips, onRename }: Props) {
   if (trips.length === 0) {
     return (
       <div className="p-8">
@@ -25,18 +28,32 @@ export function TripList({ trips }: Props) {
       <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-4">Trips</h2>
       <div className="rounded-lg border border-gray-200 overflow-hidden bg-white">
         {trips.map((trip, i) => (
-          <Link
+          <div
             key={trip.id}
-            to={`/trips/${trip.id}/packing`}
-            className={`flex items-center justify-between px-5 py-3.5 hover:bg-indigo-50 transition-colors ${
+            className={`flex items-center gap-3 px-5 py-3.5 ${
               i > 0 ? "border-t border-gray-100" : ""
             }`}
           >
-            <span className="font-medium text-gray-900">{trip.name}</span>
-            <span className="text-xs text-gray-400">
+            <div className="flex-1 min-w-0 font-medium text-gray-900">
+              <EditableCell
+                value={trip.name}
+                onSave={async (name) => {
+                  const updated = await api.renameTrip(trip.id, name);
+                  onRename(updated);
+                }}
+                validate={(v) => (v.trim() ? null : "Name cannot be empty")}
+              />
+            </div>
+            <span className="text-xs text-gray-400 shrink-0">
               {new Date(trip.created_at).toLocaleDateString()}
             </span>
-          </Link>
+            <Link
+              to={`/trips/${trip.id}/packing`}
+              className="text-sm text-indigo-600 hover:text-indigo-800 shrink-0 font-medium"
+            >
+              Open →
+            </Link>
+          </div>
         ))}
       </div>
       <div className="mt-4">

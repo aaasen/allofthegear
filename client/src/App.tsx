@@ -18,7 +18,6 @@ function tabLabel(t: Tab) {
 
 function TripLayout({ trips }: { trips: Trip[] }) {
   const { tripId: tripIdParam, tab } = useParams<{ tripId: string; tab: string }>();
-  const navigate = useNavigate();
   const tripId = Number(tripIdParam);
   const currentTrip = trips.find((t) => t.id === tripId);
 
@@ -28,7 +27,7 @@ function TripLayout({ trips }: { trips: Trip[] }) {
     <div className="min-h-screen bg-gray-50">
       <header className="bg-white border-b border-gray-200">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
-          {/* Row 1: title + trip selector */}
+          {/* Row 1: title + trip name */}
           <div className="flex items-center h-12 gap-3">
             <Link
               to="/"
@@ -37,21 +36,9 @@ function TripLayout({ trips }: { trips: Trip[] }) {
               All of the Gear
             </Link>
 
-            {trips.length > 1 ? (
-              <select
-                value={tripId}
-                onChange={(e) => navigate(`/trips/${e.target.value}/${tab}`)}
-                className="border border-gray-200 rounded-lg px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 min-w-0 truncate"
-              >
-                {trips.map((t) => (
-                  <option key={t.id} value={t.id}>
-                    {t.name}
-                  </option>
-                ))}
-              </select>
-            ) : currentTrip ? (
-              <span className="text-sm text-gray-500 truncate">{currentTrip.name}</span>
-            ) : null}
+            {currentTrip && (
+              <span className="text-sm text-gray-400 truncate">{currentTrip.name}</span>
+            )}
 
             {/* Desktop: tabs inline in row 1 */}
             <nav className="hidden sm:flex gap-1 ml-auto">
@@ -165,6 +152,10 @@ export function App() {
     navigate(`/trips/${trip.id}/packing`);
   };
 
+  const handleRename = (updated: Trip) => {
+    setTrips((prev) => prev.map((t) => (t.id === updated.id ? updated : t)));
+  };
+
   return (
     <Routes>
       <Route
@@ -173,7 +164,7 @@ export function App() {
           <div className="min-h-screen bg-gray-50">
             <AppHeader />
             <main className="max-w-6xl mx-auto">
-              <TripList trips={trips} />
+              <TripList trips={trips} onRename={handleRename} />
             </main>
           </div>
         }

@@ -10,6 +10,22 @@ router.get("/", (_req, res) => {
   res.json(trips);
 });
 
+router.patch("/:id", (req, res) => {
+  const { name } = req.body as { name?: string };
+  if (!name?.trim()) {
+    res.status(400).json({ error: "name is required" });
+    return;
+  }
+  const db = getDb();
+  const result = db.prepare("UPDATE trips SET name = ? WHERE id = ?").run(name.trim(), req.params.id);
+  if (result.changes === 0) {
+    res.status(404).json({ error: "trip not found" });
+    return;
+  }
+  const trip = db.prepare("SELECT id, name, created_at FROM trips WHERE id = ?").get(req.params.id);
+  res.json(trip);
+});
+
 router.post("/import", (req, res) => {
   const { name, items } = req.body as {
     name?: string;

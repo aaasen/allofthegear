@@ -43,6 +43,9 @@ export const api = {
   getWeight: (tripId: number) =>
     request<WeightSummary>(`/trips/${tripId}/weight`),
 
+  renameTrip: (tripId: number, name: string) =>
+    request<Trip>(`/trips/${tripId}`, { method: "PATCH", body: JSON.stringify({ name }) }),
+
   importTrip: (payload: { name: string; items: ImportItem[] }) =>
     request<Trip>("/trips/import", { method: "POST", body: JSON.stringify(payload) }),
 };
