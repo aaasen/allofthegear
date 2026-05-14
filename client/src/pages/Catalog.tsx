@@ -1,10 +1,12 @@
 import { useEffect, useMemo, useState } from "react";
+import Papa from "papaparse";
 import { api } from "../api/client";
 import type { TripItem } from "../api/types";
 import { EditableCell } from "../components/EditableCell";
 
 interface Props {
   tripId: number;
+  tripName: string;
 }
 
 type SortKey = "name" | "group_name" | "type" | "weight_g" | "quantity" | "bag_name" | "packed";
@@ -16,7 +18,7 @@ function validateWeight(v: string): string | null {
   return null;
 }
 
-export function Catalog({ tripId }: Props) {
+export function Catalog({ tripId, tripName }: Props) {
   const [items, setItems] = useState<TripItem[]>([]);
   const [search, setSearch] = useState("");
   const [sortKey, setSortKey] = useState<SortKey>("group_name");
@@ -88,6 +90,22 @@ export function Catalog({ tripId }: Props) {
 
   const totalWeight = filtered.reduce((sum, i) => sum + (i.weight_g ?? 0) * i.quantity, 0);
 
+  const handleExport = () => {
+    const csv = Papa.unparse(items.map((i) => ({
+      Name: i.name,
+      "Weight (g)": i.weight_g ?? "",
+      Type: i.type ?? "",
+      Group: i.group_name ?? "",
+      Bag: i.bag_name ?? "",
+      Packed: i.packed,
+      [tripName]: i.quantity,
+    })));
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv" }));
+    a.download = `${tripName}.csv`;
+    a.click();
+  };
+
   function SortHeader({ label, k }: { label: string; k: SortKey }) {
     return (
       <th
@@ -123,8 +141,16 @@ export function Catalog({ tripId }: Props) {
             </option>
           ))}
         </select>
-        <div className="ml-auto text-sm text-gray-500 self-center">
-          {filtered.length} items · {(totalWeight / 1000).toFixed(2)} kg
+        <div className="ml-auto flex items-center gap-3">
+          <span className="text-sm text-gray-500">
+            {filtered.length} items · {(totalWeight / 1000).toFixed(2)} kg
+          </span>
+          <button
+            onClick={handleExport}
+            className="px-3 py-1.5 text-sm font-medium text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+          >
+            Export CSV
+          </button>
         </div>
       </div>
 

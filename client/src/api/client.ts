@@ -1,11 +1,14 @@
-import type { Bag, Trip, TripItem, WeightSummary } from "./types";
+import type { Bag, ImportItem, Trip, TripItem, WeightSummary } from "./types";
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(`/api${path}`, {
     headers: { "Content-Type": "application/json" },
     ...init,
   });
-  if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
+  if (!res.ok) {
+    const body = await res.text().catch(() => "");
+    throw new Error(`${res.status}: ${body || res.statusText}`);
+  }
   return res.json() as Promise<T>;
 }
 
@@ -39,4 +42,7 @@ export const api = {
 
   getWeight: (tripId: number) =>
     request<WeightSummary>(`/trips/${tripId}/weight`),
+
+  importTrip: (payload: { name: string; items: ImportItem[] }) =>
+    request<Trip>("/trips/import", { method: "POST", body: JSON.stringify(payload) }),
 };

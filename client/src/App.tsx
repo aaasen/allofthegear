@@ -4,8 +4,9 @@ import type { Trip } from "./api/types";
 import { Packing } from "./pages/Packing";
 import { Analysis } from "./pages/Analysis";
 import { Catalog } from "./pages/Catalog";
+import { Import } from "./pages/Import";
 
-type Tab = "packing" | "analysis" | "catalog";
+type Tab = "packing" | "analysis" | "catalog" | "import";
 
 export function App() {
   const [trips, setTrips] = useState<Trip[]>([]);
@@ -62,20 +63,36 @@ export function App() {
                 {t}
               </button>
             ))}
+            <button
+              onClick={() => setTab("import")}
+              className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
+                tab === "import"
+                  ? "bg-indigo-50 text-indigo-700"
+                  : "text-gray-500 hover:text-gray-900"
+              }`}
+            >
+              + Import
+            </button>
           </nav>
         </div>
       </header>
 
       {/* Content */}
       <main className="max-w-6xl mx-auto">
-        {tripId == null ? (
+        {tab === "import" ? (
+          <Import onImport={(trip) => {
+            setTrips((prev) => [...prev, trip]);
+            setTripId(trip.id);
+            setTab("packing");
+          }} />
+        ) : tripId == null ? (
           <div className="p-8 text-gray-400">No trips found.</div>
         ) : tab === "packing" ? (
           <Packing tripId={tripId} />
         ) : tab === "analysis" ? (
           <Analysis tripId={tripId} />
         ) : (
-          <Catalog tripId={tripId} />
+          <Catalog tripId={tripId} tripName={currentTrip?.name ?? ""} />
         )}
       </main>
     </div>

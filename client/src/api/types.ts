@@ -37,6 +37,17 @@ export interface WeightByGroup {
   item_count: number;
 }
 
+export interface ImportItem {
+  name: string;
+  weight_g: number | null;
+  type: string | null;
+  group_name: string | null;
+  is_group_gear: number;
+  quantity: number;
+  bag_name?: string | null;
+  packed?: number;
+}
+
 export interface WeightSummary {
   total_weight_g: number;
   unknown_count: number;
