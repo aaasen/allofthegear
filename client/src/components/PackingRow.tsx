@@ -16,37 +16,48 @@ export function PackingRow({ item, bags, onSelectBag, onTogglePacked }: Props) {
       ? item.quantity > 1
         ? `${item.weight_g * item.quantity}g (${item.quantity}×${item.weight_g}g)`
         : `${item.weight_g}g`
-      : "—";
+      : null;
 
   return (
-    <tr
+    <div
       onClick={() => onTogglePacked(item)}
-      className={`border-b border-gray-100 cursor-pointer select-none ${
+      className={`flex items-center gap-2 px-3 py-2.5 border-b border-gray-100 last:border-b-0 cursor-pointer select-none ${
         packed ? "bg-gray-100 hover:bg-gray-200" : "bg-white hover:bg-gray-50"
       }`}
     >
-      <td className="py-2 pl-3 pr-1 text-center text-base leading-none">
+      {/* Packed indicator */}
+      <div className="text-base leading-none w-7 shrink-0 text-center">
         {packed ? "✅" : "❌"}
-      </td>
-      <td className={`py-2 pr-4 text-sm truncate ${packed ? "line-through text-gray-400" : "text-gray-900"}`}>
-        {item.name}
+      </div>
+
+      {/* Name + meta */}
+      <div className="flex-1 min-w-0">
+        <span
+          className={`text-sm ${packed ? "line-through text-gray-400" : "text-gray-900"}`}
+        >
+          {item.name}
+        </span>
         {item.quantity > 1 && (
           <span className="ml-1.5 text-xs text-gray-400">×{item.quantity}</span>
         )}
-      </td>
-      <td className="hidden sm:table-cell py-2 pr-4 text-xs text-gray-400 truncate whitespace-nowrap">
-        {item.type ?? "—"}
-      </td>
-      <td className="hidden sm:table-cell py-2 pr-4 text-sm text-gray-500 tabular-nums whitespace-nowrap">
-        {weightDisplay}
-      </td>
-      <td className="py-2 pr-3" onClick={(e) => e.stopPropagation()}>
+        {item.type && (
+          <span className="hidden sm:inline ml-2 text-xs text-gray-400">{item.type}</span>
+        )}
+        {weightDisplay && (
+          <span className="hidden sm:inline ml-2 text-xs text-gray-500 tabular-nums">
+            {weightDisplay}
+          </span>
+        )}
+      </div>
+
+      {/* Bag buttons — always right-anchored */}
+      <div className="shrink-0" onClick={(e) => e.stopPropagation()}>
         <BagButtons
           bags={bags}
           activeBagId={item.bag_id}
           onSelect={(bagId) => onSelectBag(item, bagId)}
         />
-      </td>
-    </tr>
+      </div>
+    </div>
   );
 }

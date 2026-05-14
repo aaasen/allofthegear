@@ -70,7 +70,7 @@ export function Packing({ tripId }: Props) {
   if (loading) return <div className="p-8 text-gray-400">Loading...</div>;
 
   return (
-    <div className="flex flex-col sm:flex-row gap-6 p-6">
+    <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 p-4 sm:p-6">
       {/* Sidebar — full width on mobile, fixed column on sm+ */}
       <div className="w-full sm:w-44 sm:shrink-0 sm:order-last">
         <div className="sm:sticky sm:top-6">
@@ -155,26 +155,15 @@ export function Packing({ tripId }: Props) {
                   </span>
                 </div>
                 <div className="rounded-lg border border-gray-200 overflow-hidden">
-                  <table className="w-full table-fixed">
-                    <colgroup>
-                      <col className="w-9" />
-                      <col />
-                      <col className="w-0 sm:w-28" />
-                      <col className="w-0 sm:w-32" />
-                      <col className="w-48" />
-                    </colgroup>
-                    <tbody>
-                      {groupItems.map((item) => (
-                        <PackingRow
-                          key={item.id}
-                          item={item}
-                          bags={bags}
-                          onSelectBag={handleSelectBag}
-                          onTogglePacked={handleTogglePacked}
-                        />
-                      ))}
-                    </tbody>
-                  </table>
+                  {groupItems.map((item) => (
+                    <PackingRow
+                      key={item.id}
+                      item={item}
+                      bags={bags}
+                      onSelectBag={handleSelectBag}
+                      onTogglePacked={handleTogglePacked}
+                    />
+                  ))}
                 </div>
               </div>
             );

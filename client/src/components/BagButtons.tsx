@@ -36,7 +36,8 @@ export function BagButtons({ bags, activeBagId, onSelect }: Props) {
               isActive ? activeClass : inactiveClass
             }`}
           >
-            {bag.name}
+            <span className="sm:hidden">{bag.name[0]}</span>
+            <span className="hidden sm:inline">{bag.name}</span>
           </button>
         );
       })}

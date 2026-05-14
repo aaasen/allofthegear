@@ -10,6 +10,12 @@ import { TripList } from "./pages/TripList";
 
 type Tab = "packing" | "analysis" | "catalog";
 
+const tabs: Tab[] = ["packing", "analysis", "catalog"];
+
+function tabLabel(t: Tab) {
+  return t.charAt(0).toUpperCase() + t.slice(1);
+}
+
 function TripLayout({ trips }: { trips: Trip[] }) {
   const { tripId: tripIdParam, tab } = useParams<{ tripId: string; tab: string }>();
   const navigate = useNavigate();
@@ -18,50 +24,82 @@ function TripLayout({ trips }: { trips: Trip[] }) {
 
   if (!tab) return <Navigate to={`/trips/${tripId}/packing`} replace />;
 
-  const tabs: Tab[] = ["packing", "analysis", "catalog"];
-
   return (
     <div className="min-h-screen bg-gray-50">
       <header className="bg-white border-b border-gray-200">
-        <div className="max-w-6xl mx-auto px-6 flex items-center h-14 gap-6">
-          <Link to="/" className="font-bold text-gray-900 text-lg tracking-tight hover:text-indigo-700 transition-colors">
-            All of the Gear
-          </Link>
-
-          {trips.length > 1 ? (
-            <select
-              value={tripId}
-              onChange={(e) => navigate(`/trips/${e.target.value}/${tab}`)}
-              className="border border-gray-200 rounded-lg px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300"
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
+          {/* Row 1: title + trip selector */}
+          <div className="flex items-center h-12 gap-3">
+            <Link
+              to="/"
+              className="font-bold text-gray-900 text-base sm:text-lg tracking-tight hover:text-indigo-700 transition-colors whitespace-nowrap"
             >
-              {trips.map((t) => (
-                <option key={t.id} value={t.id}>
-                  {t.name}
-                </option>
-              ))}
-            </select>
-          ) : currentTrip ? (
-            <span className="text-sm text-gray-500">{currentTrip.name}</span>
-          ) : null}
+              All of the Gear
+            </Link>
 
-          <nav className="flex gap-1 ml-auto">
+            {trips.length > 1 ? (
+              <select
+                value={tripId}
+                onChange={(e) => navigate(`/trips/${e.target.value}/${tab}`)}
+                className="border border-gray-200 rounded-lg px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 min-w-0 truncate"
+              >
+                {trips.map((t) => (
+                  <option key={t.id} value={t.id}>
+                    {t.name}
+                  </option>
+                ))}
+              </select>
+            ) : currentTrip ? (
+              <span className="text-sm text-gray-500 truncate">{currentTrip.name}</span>
+            ) : null}
+
+            {/* Desktop: tabs inline in row 1 */}
+            <nav className="hidden sm:flex gap-1 ml-auto">
+              {tabs.map((t) => (
+                <NavLink
+                  key={t}
+                  to={`/trips/${tripId}/${t}`}
+                  className={({ isActive }) =>
+                    `px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
+                      isActive ? "bg-indigo-50 text-indigo-700" : "text-gray-500 hover:text-gray-900"
+                    }`
+                  }
+                >
+                  {tabLabel(t)}
+                </NavLink>
+              ))}
+              <NavLink
+                to="/import"
+                className={({ isActive }) =>
+                  `px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
+                    isActive ? "bg-indigo-50 text-indigo-700" : "text-gray-500 hover:text-gray-900"
+                  }`
+                }
+              >
+                + Import
+              </NavLink>
+            </nav>
+          </div>
+
+          {/* Mobile: tabs on second row */}
+          <nav className="flex sm:hidden gap-1 pb-2 overflow-x-auto">
             {tabs.map((t) => (
               <NavLink
                 key={t}
                 to={`/trips/${tripId}/${t}`}
                 className={({ isActive }) =>
-                  `px-3 py-1.5 rounded-md text-sm font-medium capitalize transition-colors ${
+                  `px-3 py-1.5 rounded-md text-sm font-medium whitespace-nowrap transition-colors ${
                     isActive ? "bg-indigo-50 text-indigo-700" : "text-gray-500 hover:text-gray-900"
                   }`
                 }
               >
-                {t}
+                {tabLabel(t)}
               </NavLink>
             ))}
             <NavLink
               to="/import"
               className={({ isActive }) =>
-                `px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
+                `px-3 py-1.5 rounded-md text-sm font-medium whitespace-nowrap transition-colors ${
                   isActive ? "bg-indigo-50 text-indigo-700" : "text-gray-500 hover:text-gray-900"
                 }`
               }
@@ -90,8 +128,11 @@ function TripLayout({ trips }: { trips: Trip[] }) {
 function AppHeader() {
   return (
     <header className="bg-white border-b border-gray-200">
-      <div className="max-w-6xl mx-auto px-6 flex items-center h-14 gap-6">
-        <Link to="/" className="font-bold text-gray-900 text-lg tracking-tight hover:text-indigo-700 transition-colors">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 flex items-center h-12 gap-3">
+        <Link
+          to="/"
+          className="font-bold text-gray-900 text-base sm:text-lg tracking-tight hover:text-indigo-700 transition-colors"
+        >
           All of the Gear
         </Link>
         <nav className="flex gap-1 ml-auto">
