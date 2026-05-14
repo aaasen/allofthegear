@@ -3,7 +3,7 @@ import path from "path";
 import { initSchema } from "./schema";
 import { seedIfEmpty } from "./seed";
 
-const DB_PATH = path.join(__dirname, "../../gear.db");
+const DB_PATH = path.join(__dirname, "../../data/gear.db");
 
 let _db: BetterSqlite3.Database | null = null;
 
